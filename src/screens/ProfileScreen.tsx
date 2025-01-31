@@ -59,9 +59,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const data = username ? 
-        await profileAPI.getProfile(username) : 
-        await profileAPI.getMyProfile();
+      let data;
+      
+      if (username) {
+        data = await profileAPI.getProfile(username);
+      } else {
+        data = await profileAPI.getMyProfile();
+      }
+      
       setProfile(data);
       
       if (data.avatar && data.avatar !== 'None') {

@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUTH_API_URL = 'https://api.elemsocial.com';
 const POSTS_API_URL = 'https://elemsocial.com';
+const SYSTEM_API_URL = 'https://elemsocial.com/System/API';
 
-// Create axios instances with base URLs
 const authApi = axios.create({
   baseURL: AUTH_API_URL,
   headers: {
@@ -17,6 +17,14 @@ const postsApi = axios.create({
   baseURL: POSTS_API_URL,
   headers: {
     'Content-Type': 'multipart/form-data',
+    'api': 'true'
+  }
+});
+
+const systemApi = axios.create({
+  baseURL: SYSTEM_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
     'api': 'true'
   }
 });
@@ -66,6 +74,15 @@ postsApi.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Add interceptor to include S-KEY in requests
+systemApi.interceptors.request.use(async (config) => {
+  const sKey = await AsyncStorage.getItem('S-KEY');
+  if (sKey) {
+    config.headers['S-KEY'] = sKey;
+  }
+  return config;
+});
 
 // Types
 export interface LoginResponse {
@@ -152,6 +169,41 @@ export const authAPI = {
 
 // Profile API
 export const profileAPI = {
+  async getMyProfile(): Promise<ProfileData> {
+    try {
+      const response = await systemApi.get('/Connect.php');
+      const data = response.data;
+      
+      return {
+        type: 'user',
+        id: parseInt(data.ID || '0'),
+        name: data.Name || '',
+        username: data.Username || '',
+        cover: data.Cover || 'None',
+        avatar: data.Avatar || 'None',
+        description: data.Description || null,
+        posts: parseInt(data.Posts || '0'),
+        subscribers: parseInt(data.Subscribers || '0'),
+        subscribed: data.Subscribed === 'true',
+        create_date: data.CreateDate || '',
+        icons: data.Icons ? data.Icons.split(',') : [],
+        subscriptions: parseInt(data.Subscriptions || '0'),
+        links_count: parseInt(data.LinksCount || '0'),
+        links: data.Links || null,
+        my_profile: true,
+        permissions: {
+          posts: data.Posts_Permission === 'true',
+          comments: data.Comments_Permission === 'true',
+          new_chats: data.NewChats_Permission === 'true',
+          music_upload: data.MusicUpload_Permission === 'true'
+        }
+      };
+    } catch (error) {
+      console.error('Error getting profile:', error);
+      throw error;
+    }
+  },
+
   async getProfile(username: string): Promise<ProfileData> {
     try {
       const formData = new FormData();
@@ -172,16 +224,6 @@ export const profileAPI = {
       throw new Error('Failed to fetch profile data');
     } catch (error) {
       console.error('getProfile error:', error);
-      throw error;
-    }
-  },
-
-  async getMyProfile(): Promise<ProfileData> {
-    try {
-      const response = await authApi.get('/profile');
-      return response.data;
-    } catch (error) {
-      console.error('Error getting profile:', error);
       throw error;
     }
   },
