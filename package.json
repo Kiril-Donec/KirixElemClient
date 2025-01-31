@@ -41,6 +41,7 @@
     "@types/react": "~18.3.12",
     "gh-pages": "^6.3.0",
     "http-proxy-middleware": "^3.0.3",
+    "terser-webpack-plugin": "^5.3.11",
     "typescript": "^5.3.3"
   },
   "proxy": "https://api.elemsocial.com",

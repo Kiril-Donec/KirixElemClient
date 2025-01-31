@@ -1,4 +1,5 @@
 const createExpoWebpackConfigAsync = require('@expo/webpack-config');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = async function (env, argv) {
   const config = await createExpoWebpackConfigAsync(env, argv);
