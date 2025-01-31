@@ -239,25 +239,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username = 'KiriXDev' }) 
 
         {renderStats()}
 
-        {profile?.my_profile && (
-          <View style={styles.profileButtons}>
-            <TouchableOpacity 
-              style={styles.editButton}
-              onPress={() => {/* Add edit profile navigation */}}
-            >
-              <Text style={styles.editButtonText}>Редактировать профиль</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.editButton, styles.logoutButton]}
-              onPress={handleLogout}
-            >
-              <Icon name="logout" size={20} color="#fff" />
-              <Text style={styles.editButtonText}>Выйти</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
         {profile?.icons && profile.icons.length > 0 && (
           <View style={styles.iconsContainer}>
             {iconUrls.map((iconUrl, index) => (
@@ -373,33 +354,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 4,
-  },
-  editButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignSelf: 'center',
-    marginBottom: 15,
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 5,
-  },
-  profileButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-    paddingHorizontal: 15,
-    width: '100%',
-  },
-  logoutButton: {
-    backgroundColor: '#ff3b30',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   iconsContainer: {
     flexDirection: 'row',
