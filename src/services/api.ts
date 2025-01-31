@@ -22,6 +22,29 @@ const postsApi = axios.create({
 });
 
 // Add interceptor to include S-KEY in requests
+authApi.interceptors.request.use(async (config) => {
+  const sKey = await AsyncStorage.getItem('S-KEY');
+  if (sKey) {
+    config.headers['S-KEY'] = sKey;
+  }
+  return config;
+});
+
+// Add response error handling
+authApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    console.error('API Error:', error?.response?.data || error.message);
+    if (error?.response?.status === 401) {
+      // Handle unauthorized error (invalid or expired S-KEY)
+      await AsyncStorage.removeItem('S-KEY');
+      // You might want to trigger a logout here
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Add interceptor to include S-KEY in requests
 postsApi.interceptors.request.use(async (config) => {
   const sKey = await AsyncStorage.getItem('S-KEY');
   if (sKey) {
@@ -154,11 +177,13 @@ export const profileAPI = {
   },
 
   async getMyProfile(): Promise<ProfileData> {
-    const username = await AsyncStorage.getItem('username');
-    if (!username) {
-      throw new Error('Username not found in storage');
+    try {
+      const response = await authApi.get('/profile');
+      return response.data;
+    } catch (error) {
+      console.error('Error getting profile:', error);
+      throw error;
     }
-    return this.getProfile(username);
   },
 
   updateProfile: async (data: Partial<ProfileData>): Promise<ApiResponse> => {

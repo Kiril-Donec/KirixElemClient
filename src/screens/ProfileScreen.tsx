@@ -59,7 +59,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username = 'KiriXDev' }) 
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const data = await profileAPI.getProfile(username);
+      const data = username ? 
+        await profileAPI.getProfile(username) : 
+        await profileAPI.getMyProfile();
       setProfile(data);
       
       if (data.avatar && data.avatar !== 'None') {
