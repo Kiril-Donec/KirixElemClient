@@ -89,6 +89,8 @@ const Navigation = () => {
   }, []);
 
   const checkLoginStatus = async () => {
+    // Очищаем хранилище при запуске
+    await AsyncStorage.clear();
     const sKey = await AsyncStorage.getItem('S-KEY');
     setIsLoggedIn(!!sKey);
   };
