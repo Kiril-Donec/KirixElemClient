@@ -27,7 +27,7 @@ interface ProfileScreenProps {
   username?: string; // Опциональный, если не передан - показываем свой профиль
 }
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ username = 'KiriXDev' }) => {
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
   const { logout } = useContext(AuthContext);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
