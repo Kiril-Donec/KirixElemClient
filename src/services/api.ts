@@ -8,7 +8,7 @@ const SYSTEM_API_URL = 'https://elemsocial.com/System/API';
 const authApi = axios.create({
   baseURL: AUTH_API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'multipart/form-data',
     'api': 'true'
   }
 });
@@ -158,14 +158,22 @@ export const getImageUrl = async (path: string | null | undefined): Promise<stri
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await authApi.post<LoginResponse>('/Login.php', {
-      email,
-      password
-    });
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+    
+    const response = await authApi.post<LoginResponse>('/Login.php', formData);
     
     if (response.data.status === 'success' && response.data.S_KEY) {
       // Сохраняем ключ сессии
       await AsyncStorage.setItem('S-KEY', response.data.S_KEY);
+      
+      // Сразу делаем запрос к Connect.php для получения данных профиля
+      try {
+        await systemApi.get('/Connect.php');
+      } catch (error) {
+        console.error('Error fetching profile after login:', error);
+      }
     }
     
     return response.data;
@@ -176,7 +184,7 @@ export const authAPI = {
 export const profileAPI = {
   async getMyProfile(): Promise<ProfileData> {
     try {
-      const response = await systemApi.get('/Connect.php');
+      const response = await postsApi.get('/LoadPosts.php?F=USER');
       const data = response.data;
       
       return {
