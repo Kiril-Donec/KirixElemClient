@@ -258,11 +258,13 @@ export const profileAPI = {
 export const postsAPI = {
   // Load single post
   loadPost: async (postId: string): Promise<PostResponse> => {
-    const formData = new FormData();
-    formData.append('PostID', postId);
-
-    const response = await postsApi.post('/System/API/LoadPost.php', formData);
-    return response.data;
+    try {
+      const response = await systemApi.get(`/GetPost.php?ID=${postId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error loading post:', error);
+      throw error;
+    }
   },
 
   // Create post
@@ -272,124 +274,78 @@ export const postsAPI = {
     clearMetadata = false,
     censoring = false
   ): Promise<ApiResponse> => {
-    const formData = new FormData();
-    formData.append('Text', text);
-    
-    // Добавляем файлы в Files[]
-    files.forEach(file => {
-      formData.append('Files[]', file);
-    });
+    try {
+      const formData = new FormData();
+      formData.append('Text', text);
+      files.forEach((file) => {
+        formData.append('Files[]', file);
+      });
+      if (clearMetadata) {
+        formData.append('ClearMetadata', 'true');
+      }
+      if (censoring) {
+        formData.append('Censoring', 'true');
+      }
 
-    if (clearMetadata) {
-      formData.append('ClearMetadataIMG', 'true');
+      const response = await systemApi.post('/CreatePost.php', formData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
     }
-    if (censoring) {
-      formData.append('CensoringIMG', 'true');
-    }
-
-    const response = await postsApi.post<ApiResponse>('/System/API/AddPost.php', formData);
-    return response.data;
   },
 
   // Get single post
   getPost: async (postId: string): Promise<PostResponse> => {
-    const formData = new FormData();
-    formData.append('PostID', postId);
-
-    const response = await postsApi.post<PostResponse>('/System/API/LoadPost.php', formData);
-    return response.data;
-  },
-
-  getPosts: async (type: 'LATEST' | 'REC' | 'SUBSCRIPTIONS', startIndex?: number): Promise<PostResponse[]> => {
     try {
-      const formData = new FormData();
-      formData.append('StartIndex', startIndex?.toString() || '0');
-
-      const url = `/System/API/LoadPosts.php?F=${type}`;
-      console.log('Making request to:', url);
-      console.log('With FormData:', {
-        StartIndex: startIndex?.toString() || '0'
-      });
-
-      const response = await postsApi.post(url, formData);
-      console.log(`${type} posts raw response:`, response.data);
-
-      // Ensure we have an array of posts
-      const postsArray = Array.isArray(response.data) ? response.data : [];
-      console.log('Posts array length:', postsArray.length);
-
-      // Map and validate each post
-      const posts = postsArray.map(post => ({
-        ID: String(post.ID || ''),
-        AuthorID: String(post.AuthorID || ''),
-        Username: String(post.Username || ''),
-        Name: String(post.Name || ''),
-        Avatar: post.Avatar || 'None',
-        UserIcons: post.UserIcons || null,
-        Text: String(post.Text || ''),
-        Content: post.Content || null,
-        Date: String(post.Date || ''),
-        Likes: Number(post.Likes) || 0,
-        Dislikes: Number(post.Dislikes) || 0,
-        Liked: post.Liked || null,
-        Disliked: post.Disliked || null,
-        Comments: Number(post.Comments) || 0,
-        MyPost: Boolean(post.MyPost)
-      }));
-      
-      return posts;
+      const response = await systemApi.get(`/GetPost.php?ID=${postId}`);
+      return response.data;
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      if (axios.isAxiosError(error)) {
-        console.error('Response:', error.response?.data);
-        console.error('Status:', error.response?.status);
-        console.error('Headers:', error.response?.headers);
-      }
-      return [];
+      console.error('Error getting post:', error);
+      throw error;
     }
   },
 
-  getUserPosts: async (userId: string, startIndex?: number): Promise<PostResponse[]> => {
+  // Get posts
+  getPosts: async (type: 'LATEST' | 'REC' | 'SUBSCRIPTIONS', startIndex?: number): Promise<PostResponse[]> => {
     try {
-      const formData = new FormData();
-      formData.append('UserID', userId);
+      let url = '/LoadPosts.php?';
+      switch (type) {
+        case 'LATEST':
+          url += 'F=LATEST';
+          break;
+        case 'REC':
+          url += 'F=REC';
+          break;
+        case 'SUBSCRIPTIONS':
+          url += 'F=SUBSCRIPTIONS';
+          break;
+      }
       if (startIndex !== undefined) {
-        formData.append('StartIndex', startIndex.toString());
+        url += `&StartIndex=${startIndex}`;
       }
 
-      const url = '/System/API/LoadPosts.php?F=USER';
-      console.log('Fetching user posts, UserID:', userId, 'StartIndex:', startIndex);
-      
-      const response = await postsApi.post<any>(url, formData);
-      console.log('User posts raw response:', response.data);
-
-      // Ensure we have an array of posts
-      const postsArray = Array.isArray(response.data) ? response.data : [];
-
-      // Map and validate each post
-      const posts = postsArray.map(post => ({
-        ID: String(post.ID || ''),
-        AuthorID: String(post.AuthorID || ''),
-        Username: String(post.Username || ''),
-        Name: String(post.Name || ''),
-        Avatar: post.Avatar || 'None',
-        UserIcons: post.UserIcons || null,
-        Text: String(post.Text || ''),
-        Content: post.Content || null,
-        Date: String(post.Date || ''),
-        Likes: Number(post.Likes) || 0,
-        Dislikes: Number(post.Dislikes) || 0,
-        Liked: post.Liked || null,
-        Disliked: post.Disliked || null,
-        Comments: Number(post.Comments) || 0,
-        MyPost: Boolean(post.MyPost)
-      }));
-      
-      console.log('User posts processed:', posts);
-      return posts;
+      const response = await systemApi.get(url);
+      return response.data;
     } catch (error) {
-      console.error('Error fetching user posts:', error);
-      return [];
+      console.error('Error getting posts:', error);
+      throw error;
+    }
+  },
+
+  // Get user posts
+  getUserPosts: async (userId: string, startIndex?: number): Promise<PostResponse[]> => {
+    try {
+      let url = '/LoadPosts.php?F=USER';
+      if (startIndex !== undefined) {
+        url += `&StartIndex=${startIndex}`;
+      }
+
+      const response = await systemApi.get(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting user posts:', error);
+      throw error;
     }
   },
 
@@ -398,29 +354,37 @@ export const postsAPI = {
     action: 'LIKE' | 'DISLIKE' | 'DELETE',
     postId: string
   ): Promise<ApiResponse> => {
-    const formData = new FormData();
-    formData.append('PostID', postId);
-
-    const response = await postsApi.post<ApiResponse>(`/System/API/PostInteraction.php?F=${action}`, formData);
-    return response.data;
+    try {
+      const response = await systemApi.post(`/${action}Post.php`, { ID: postId });
+      return response.data;
+    } catch (error) {
+      console.error('Error interacting with post:', error);
+      throw error;
+    }
   },
 
   // Add comment to post
   addComment: async (postId: string, text: string): Promise<ApiResponse> => {
-    const formData = new FormData();
-    formData.append('PostID', postId);
-    formData.append('Text', text);
-
-    const response = await postsApi.post<ApiResponse>('/System/API/PostInteraction.php?F=POST_COMMENT', formData);
-    return response.data;
+    try {
+      const response = await systemApi.post('/AddComment.php', {
+        ID: postId,
+        Text: text
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      throw error;
+    }
   },
 
   // Get post comments
   getComments: async (postId: string): Promise<CommentResponse[]> => {
-    const formData = new FormData();
-    formData.append('PostID', postId);
-
-    const response = await postsApi.post<CommentResponse[]>('/System/API/PostInteraction.php?F=LOAD_COMMENT', formData);
-    return response.data;
-  },
+    try {
+      const response = await systemApi.get(`/GetComments.php?ID=${postId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting comments:', error);
+      throw error;
+    }
+  }
 };
