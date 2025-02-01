@@ -446,7 +446,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    padding: Platform.OS === 'web' ? 15 : 12,
+    padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
@@ -567,24 +567,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
   },
   reactions: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: Platform.OS === 'web' ? 20 : 12,
+    gap: 20,
   },
   reactionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Platform.OS === 'web' ? 8 : 10,
-    paddingHorizontal: Platform.OS === 'web' ? 8 : 12,
+    padding: 8,
     borderRadius: 20,
     backgroundColor: '#f8f8f8',
-    minWidth: Platform.OS === 'web' ? 'auto' : 80,
-    minHeight: Platform.OS === 'web' ? 'auto' : 44,
-    justifyContent: 'center',
   },
   reactionButtonActive: {
     backgroundColor: '#E3F2FD',
@@ -593,8 +588,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFE5E5',
   },
   reactionIcon: {
-    width: Platform.OS === 'web' ? 24 : 28,
-    height: Platform.OS === 'web' ? 24 : 28,
+    width: 24,
+    height: 24,
   },
   reactionIconActive: {
     tintColor: '#007AFF',
@@ -603,10 +598,10 @@ const styles = StyleSheet.create({
     tintColor: '#FF3B30',
   },
   reactionCount: {
-    fontSize: Platform.OS === 'web' ? 15 : 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#666',
-    marginLeft: Platform.OS === 'web' ? 6 : 8,
+    marginLeft: 6,
   },
   reactionCountActive: {
     color: '#007AFF',
