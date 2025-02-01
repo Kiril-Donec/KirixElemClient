@@ -336,12 +336,13 @@ export const postsAPI = {
   // Get user posts
   getUserPosts: async (userId: string, startIndex?: number): Promise<PostResponse[]> => {
     try {
-      let url = '/LoadPosts.php?F=USER';
+      const formData = new FormData();
+      formData.append('UserID', userId);
       if (startIndex !== undefined) {
-        url += `&StartIndex=${startIndex}`;
+        formData.append('StartIndex', startIndex.toString());
       }
 
-      const response = await systemApi.get(url);
+      const response = await systemApi.post('/LoadPosts.php?F=USER', formData);
       return response.data;
     } catch (error) {
       console.error('Error getting user posts:', error);
