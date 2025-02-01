@@ -36,7 +36,7 @@ const FeedScreen = () => {
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
   const pageRef = useRef(0);
   
-  // Animation values
+  // переменние анимок
   const loadingOpacity = useRef(new Animated.Value(0)).current;
   const contentOpacity = useRef(new Animated.Value(1)).current;
 
@@ -70,10 +70,10 @@ const FeedScreen = () => {
       clearTimeout(retryTimeoutRef.current);
     }
     try {
-      // Используем logout из контекста, который удалит токен и обновит состояние
+      // виход с акка
       await logout();
       
-      // Очищаем локальные данные
+      // удаляем все данние при виходе с акка
       setPosts([]);
       setError(null);
       setLoading(false);
@@ -94,7 +94,7 @@ const FeedScreen = () => {
       if (refresh) {
         setLoading(true);
         pageRef.current = 0;
-        // Показываем анимацию загрузки только если нет ошибки и не идет pull-to-refresh
+        // анимация загрузки
         if (!error && !refreshing) {
           animateLoading(true);
         }
@@ -129,12 +129,11 @@ const FeedScreen = () => {
       console.error('Error fetching posts:', error);
       setError('Ошибка загрузки постов\n\nПопробуйте войти еще раз, перезагрузить страницу или использовать VPN');
       
-      // Продолжаем попытки загрузки только для LATEST с увеличивающейся задержкой
+      // Продолжат попытки загрузки только для LATEST с заддержкой
       if (feedType === 'LATEST') {
         if (retryTimeoutRef.current) {
           clearTimeout(retryTimeoutRef.current);
         }
-        // Добавляем небольшую случайную задержку чтобы избежать синхронизации запросов
         const delay = RETRY_INTERVAL + Math.random() * 1000;
         retryTimeoutRef.current = setTimeout(() => {
           fetchPosts(true);
@@ -164,7 +163,7 @@ const FeedScreen = () => {
     }
   }, []);
 
-  // Load initial posts
+  // загрузк постов
   useEffect(() => {
     fetchPosts(true);
   }, [feedType]);
@@ -325,6 +324,7 @@ const FeedScreen = () => {
   );
 };
 
+// все стили ну тут и так понятно
 const styles = StyleSheet.create({
   container: {
     flex: 1,

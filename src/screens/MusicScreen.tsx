@@ -8,7 +8,7 @@ const MusicScreen = () => {
     </View>
   );
 };
-
+// сделать надо музло а пока пусто
 const styles = StyleSheet.create({
   container: {
     flex: 1,

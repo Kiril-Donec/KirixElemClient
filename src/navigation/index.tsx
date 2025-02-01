@@ -11,7 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Create auth context
 export const AuthContext = createContext<{
   isLoggedIn: boolean;
   setIsLoggedIn: (value: boolean) => void;
@@ -89,7 +88,6 @@ const Navigation = () => {
   }, []);
 
   const checkLoginStatus = async () => {
-    // Очищаем хранилище при запуске
     await AsyncStorage.clear();
     const sKey = await AsyncStorage.getItem('S-KEY');
     setIsLoggedIn(!!sKey);

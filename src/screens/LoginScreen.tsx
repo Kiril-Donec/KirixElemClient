@@ -77,7 +77,7 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    // Validate email format
+    // проверка формата почти
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       Alert.alert('Ошибка', 'Введите почту');

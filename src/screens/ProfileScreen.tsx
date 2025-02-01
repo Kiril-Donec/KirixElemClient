@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ const POSTS_PER_PAGE = 10;
 const { width } = Dimensions.get('window');
 
 interface ProfileScreenProps {
-  username?: string; // Опциональный, если не передан - показываем свой профиль
+  username?: string;
 }
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
@@ -92,9 +92,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
       }
       
       if (data.id) {
-        const newPosts = await postsAPI.getUserPosts(data.id.toString());
-        setPosts(newPosts);
-        setHasMorePosts(newPosts.length === POSTS_PER_PAGE);
+        fetchUserPosts(true);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -107,43 +105,43 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
     }
   };
 
-  const loadMorePosts = async () => {
-    if (loadingPosts || !hasMorePosts || !profile) return;
+  const fetchUserPosts = async (refresh = false) => {
+    if (!profile?.id || (!refresh && loadingPosts)) return;
 
     try {
       setLoadingPosts(true);
-      const newPosts = await postsAPI.getUserPosts(profile.id.toString(), posts.length);
+      const startIndex = refresh ? 0 : posts.length;
+      const newPosts = await postsAPI.getUserPosts(profile.id.toString(), startIndex);
       
-      if (newPosts.length === 0) {
-        setHasMorePosts(false);
+      if (refresh) {
+        setPosts(newPosts);
       } else {
-        setPosts(prevPosts => [...prevPosts, ...newPosts]);
+        setPosts(prev => [...prev, ...newPosts]);
       }
+      
+      setHasMorePosts(newPosts.length === POSTS_PER_PAGE);
     } catch (error) {
-      console.error('Error loading more posts:', error);
+      console.error('Error fetching user posts:', error);
+      Alert.alert('Ошибка', 'Не удалось загрузить посты');
     } finally {
       setLoadingPosts(false);
+      setRefreshing(false);
     }
   };
 
-  const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      await fetchProfile();
-      if (profile) {
-        const newPosts = await postsAPI.getUserPosts(profile.id.toString());
-        setPosts(newPosts);
-        setHasMorePosts(true);
-      }
-    } catch (error) {
-      console.error('Error refreshing:', error);
-    } finally {
-      setRefreshing(false);
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchProfile();
+  };
+
+  const handleLoadMore = () => {
+    if (hasMorePosts && !loadingPosts) {
+      fetchUserPosts();
     }
-  }, [profile]);
+  };
 
   const handlePostUpdate = () => {
-    onRefresh();
+    fetchUserPosts(true);
   };
 
   const handleLogout = async () => {
@@ -267,10 +265,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ username }) => {
         data={posts}
         renderItem={renderPost}
         keyExtractor={item => item.ID}
-        onEndReached={loadMorePosts}
+        onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}

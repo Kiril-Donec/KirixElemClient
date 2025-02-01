@@ -8,7 +8,7 @@ const ChannelsScreen = () => {
     </View>
   );
 };
-
+// канали тоже не сделани но файлик тут заготовлен
 const styles = StyleSheet.create({
   container: {
     flex: 1,
