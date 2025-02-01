@@ -98,9 +98,8 @@ const LoginScreen = () => {
       const response = await authAPI.login(email.trim(), password);
       console.log('Login response:', response);
       
-      if (response?.status === 'success' && response?.S_KEY) {
-        console.log('Login successful, storing S-KEY...');
-        await AsyncStorage.setItem('S-KEY', response.S_KEY);
+      if (response?.status === 'success') {
+        console.log('Login successful');
         setIsLoggedIn(true);
       } else {
         console.log('Invalid credentials');

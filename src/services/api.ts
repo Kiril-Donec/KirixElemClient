@@ -1,14 +1,14 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AUTH_API_URL = 'https://api.elemsocial.com';
+const AUTH_API_URL = 'https://elemsocial.com/System/API';
 const POSTS_API_URL = 'https://elemsocial.com';
 const SYSTEM_API_URL = 'https://elemsocial.com/System/API';
 
 const authApi = axios.create({
   baseURL: AUTH_API_URL,
   headers: {
-    'Content-Type': 'multipart/form-data',
+    'Content-Type': 'application/json',
     'api': 'true'
   }
 });
@@ -158,11 +158,16 @@ export const getImageUrl = async (path: string | null | undefined): Promise<stri
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('password', password);
-
-    const response = await authApi.post<LoginResponse>('/auth/login', formData);
+    const response = await authApi.post<LoginResponse>('/Login.php', {
+      email,
+      password
+    });
+    
+    if (response.data.status === 'success' && response.data.S_KEY) {
+      // Сохраняем ключ сессии
+      await AsyncStorage.setItem('S-KEY', response.data.S_KEY);
+    }
+    
     return response.data;
   },
 };
