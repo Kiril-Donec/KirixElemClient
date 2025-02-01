@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AUTH_API_URL = 'https://elemsocial.com/System/API';
+const AUTH_API_URL = 'https://api.elemsocial.com';
 const POSTS_API_URL = 'https://elemsocial.com';
 const SYSTEM_API_URL = 'https://elemsocial.com/System/API';
 
@@ -161,21 +161,8 @@ export const authAPI = {
     const formData = new FormData();
     formData.append('email', email);
     formData.append('password', password);
-    
-    const response = await authApi.post<LoginResponse>('/Login.php', formData);
-    
-    if (response.data.status === 'success' && response.data.S_KEY) {
-      // Сохраняем ключ сессии
-      await AsyncStorage.setItem('S-KEY', response.data.S_KEY);
-      
-      // Сразу делаем запрос к Connect.php для получения данных профиля
-      try {
-        await systemApi.get('/Connect.php');
-      } catch (error) {
-        console.error('Error fetching profile after login:', error);
-      }
-    }
-    
+
+    const response = await authApi.post<LoginResponse>('/auth/login', formData);
     return response.data;
   },
 };
@@ -184,7 +171,7 @@ export const authAPI = {
 export const profileAPI = {
   async getMyProfile(): Promise<ProfileData> {
     try {
-      const response = await postsApi.get('/LoadPosts.php?F=USER');
+      const response = await systemApi.get('/Connect.php');
       const data = response.data;
       
       return {
