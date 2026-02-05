@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.js": "/KirixElemClient/static/js/main.b736fafe.js",
+    "static/js/119.3b9ee674.js": "/KirixElemClient/static/js/119.3b9ee674.js",
+    "static/media/Ionicons.ttf": "/KirixElemClient/static/media/Ionicons.9b6b1954a5eb6efeaf11.ttf",
+    "favicon.ico": "/KirixElemClient/favicon.ico",
+    "index.html": "/KirixElemClient/index.html",
+    "favicon-32.png": "/KirixElemClient/favicon-32.png",
+    "static/media/verify.png": "/KirixElemClient/static/media/verify.c35ae86d10b99aec2123.png",
+    "favicon-16.png": "/KirixElemClient/favicon-16.png",
+    "manifest.json": "/KirixElemClient/manifest.json",
+    "serve.json": "/KirixElemClient/serve.json",
+    "main.b736fafe.js.map": "/KirixElemClient/static/js/main.b736fafe.js.map",
+    "119.3b9ee674.js.map": "/KirixElemClient/static/js/119.3b9ee674.js.map"
+  },
+  "entrypoints": [
+    "static/js/119.3b9ee674.js",
+    "static/js/main.b736fafe.js"
+  ]
+}
