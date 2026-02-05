@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://api.elemsocial.com',
+      target: 'wss://ws.elemsocial.com/',
       changeOrigin: true,
       pathRewrite: {
         '^/api': '', 

@@ -44,6 +44,6 @@
     "terser-webpack-plugin": "^5.3.11",
     "typescript": "^5.3.3"
   },
-  "proxy": "https://api.elemsocial.com",
+  "proxy": "wss://ws.elemsocial.com/",
   "private": true
 }

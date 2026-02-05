@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AUTH_API_URL = 'https://api.elemsocial.com';
+const AUTH_API_URL = 'wss://ws.elemsocial.com/';
 const POSTS_API_URL = 'https://elemsocial.com';
 const SYSTEM_API_URL = 'https://elemsocial.com/System/API';
 
